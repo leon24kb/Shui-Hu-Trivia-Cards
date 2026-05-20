@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.log
+/data/user/work/
+
+# Uploads (临时上传文件)
+.uploads/
+
+# 工作规划文档
+.trae/
