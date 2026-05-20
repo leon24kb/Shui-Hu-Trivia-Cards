@@ -1,0 +1,393 @@
+/* ===== 卡片详情弹窗 ===== */
+
+/* 遮罩层 */
+.card-detail-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: background 0.35s ease;
+}
+
+.card-detail-overlay.active {
+    background: rgba(0, 0, 0, 0.55);
+    pointer-events: auto;
+}
+
+/* 弹窗面板 - 全屏显示 */
+.card-detail-panel {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    background: linear-gradient(180deg, #faf8f0 0%, #f5f0e0 100%);
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-detail-overlay.active .card-detail-panel {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 关闭按钮 */
+.card-detail-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.5);
+    color: #faf8f0;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.card-detail-close:hover {
+    background: rgba(139, 0, 0, 0.7);
+    transform: scale(1.1);
+}
+
+/* ===== 头部区域：头像 + 姓名 ===== */
+.card-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 28px 28px 22px;
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.08) 0%, rgba(218, 165, 32, 0.06) 100%);
+    border-bottom: 2px solid rgba(139, 69, 19, 0.15);
+    flex-shrink: 0;
+}
+
+/* 头像包装器 */
+.card-detail-portrait-wrapper {
+    position: relative;
+    width: 120px;
+    height: 150px;
+    flex-shrink: 0;
+}
+
+.card-detail-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 10px;
+    border: 3px solid var(--color-border);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    display: block;
+}
+
+/* 查看大图按钮 - 位于头像底端，紧凑样式 */
+.card-detail-enlarge-btn {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 2px 0;
+    font-size: 10px;
+    color: var(--color-primary);
+    background: transparent;
+    border: 1px solid rgba(139, 69, 19, 0.3);
+    border-radius: 3px;
+    cursor: pointer;
+    text-align: center;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    line-height: 1.4;
+}
+
+.card-detail-enlarge-btn:active {
+    background: rgba(139, 69, 19, 0.1);
+}
+
+.card-detail-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.card-detail-nickname {
+    font-family: var(--font-title);
+    font-size: 28px;
+    color: var(--color-primary-light);
+    letter-spacing: 3px;
+}
+
+.card-detail-name {
+    font-family: var(--font-title);
+    font-size: 56px;
+    color: var(--color-primary);
+    letter-spacing: 10px;
+    line-height: 1.2;
+    text-shadow: 1px 1px 0 rgba(139, 69, 19, 0.08);
+}
+
+.card-detail-star {
+    font-size: 24px;
+    color: var(--color-text-light);
+    letter-spacing: 2px;
+    margin-top: 4px;
+}
+
+/* ===== 内容主体 ===== */
+.card-detail-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px 28px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 0;
+}
+
+/* 自定义滚动条 */
+.card-detail-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+.card-detail-body::-webkit-scrollbar-track {
+    background: rgba(139, 69, 19, 0.04);
+}
+
+.card-detail-body::-webkit-scrollbar-thumb {
+    background: rgba(139, 69, 19, 0.2);
+    border-radius: 3px;
+}
+
+.card-detail-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 69, 19, 0.35);
+}
+
+/* ===== 信息标签 ===== */
+.card-detail-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.detail-info-tag {
+    display: inline-block;
+    font-size: 26px;
+    color: var(--color-primary);
+    background: rgba(139, 69, 19, 0.06);
+    border: 1px solid rgba(139, 69, 19, 0.15);
+    border-radius: 24px;
+    padding: 6px 22px;
+    letter-spacing: 2px;
+}
+
+/* ===== 生平事迹 ===== */
+.card-detail-story-section h4 {
+    font-size: 30px;
+    color: var(--color-primary);
+    margin: 0 0 12px 0;
+    letter-spacing: 5px;
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(139, 69, 19, 0.12);
+}
+
+.card-detail-story {
+    font-size: 30px;
+    line-height: 2;
+    color: #444;
+    text-align: justify;
+    font-family: 'Noto Serif SC', 'FangSong', '仿宋', 'STFangsong', serif;
+}
+
+/* ===== 结局 ===== */
+.card-detail-ending-section {
+    padding: 18px 20px;
+    background: rgba(139, 0, 0, 0.04);
+    border-radius: 12px;
+    border-left: 5px solid var(--color-red);
+    flex-shrink: 0;
+}
+
+.card-detail-ending-section h4 {
+    font-size: 30px;
+    color: var(--color-red);
+    margin: 0 0 10px 0;
+    letter-spacing: 5px;
+    font-weight: 600;
+}
+
+.card-detail-ending {
+    font-size: 28px;
+    color: #555;
+    line-height: 2;
+    font-family: 'Noto Serif SC', 'FangSong', '仿宋', 'STFangsong', serif;
+}
+
+/* ===== 弹窗内拼音样式 ===== */
+.card-detail-panel .pinyin-char rt {
+    font-size: 0.5em;
+    color: #8b4513;
+    opacity: 0.75;
+}
+
+/* ===== 响应式：Pad 端（768px 以下）微调 ===== */
+@media (max-width: 768px) {
+    .card-detail-overlay.active {
+        background: rgba(0, 0, 0, 0.7);
+    }
+
+    .card-detail-header {
+        padding: 24px 20px;
+        gap: 18px;
+    }
+
+    .card-detail-portrait-wrapper {
+        width: 100px;
+        height: 125px;
+    }
+
+    .card-detail-nickname {
+        font-size: 24px;
+        letter-spacing: 2px;
+    }
+
+    .card-detail-name {
+        font-size: 48px;
+        letter-spacing: 6px;
+    }
+
+    .card-detail-star {
+        font-size: 20px;
+    }
+
+    .card-detail-body {
+        padding: 18px 20px 24px;
+        gap: 16px;
+    }
+
+    .detail-info-tag {
+        font-size: 22px;
+        padding: 5px 18px;
+        border-radius: 20px;
+    }
+
+    .card-detail-story-section h4 {
+        font-size: 26px;
+    }
+
+    .card-detail-story {
+        font-size: 26px;
+        line-height: 1.9;
+    }
+
+    .card-detail-ending-section {
+        padding: 14px 16px;
+    }
+
+    .card-detail-ending-section h4 {
+        font-size: 26px;
+    }
+
+    .card-detail-ending {
+        font-size: 24px;
+        line-height: 1.9;
+    }
+
+    .card-detail-close {
+        top: 12px;
+        right: 12px;
+        width: 44px;
+        height: 44px;
+        font-size: 26px;
+    }
+}
+
+/* ===== 响应式：手机端（480px 以下）微调 ===== */
+@media (max-width: 480px) {
+    .card-detail-header {
+        padding: 18px 14px;
+        gap: 14px;
+    }
+
+    .card-detail-portrait-wrapper {
+        width: 80px;
+        height: 100px;
+    }
+
+    .card-detail-enlarge-btn {
+        margin-top: 3px;
+        padding: 1px 0;
+        font-size: 9px;
+        border-radius: 2px;
+    }
+
+    .card-detail-nickname {
+        font-size: 20px;
+        letter-spacing: 1px;
+    }
+
+    .card-detail-name {
+        font-size: 40px;
+        letter-spacing: 4px;
+    }
+
+    .card-detail-star {
+        font-size: 18px;
+    }
+
+    .card-detail-body {
+        padding: 14px 16px 20px;
+        gap: 14px;
+    }
+
+    .detail-info-tag {
+        font-size: 18px;
+        padding: 4px 14px;
+        border-radius: 18px;
+    }
+
+    .card-detail-story-section h4 {
+        font-size: 22px;
+    }
+
+    .card-detail-story {
+        font-size: 22px;
+        line-height: 1.85;
+    }
+
+    .card-detail-ending-section {
+        padding: 12px 14px;
+    }
+
+    .card-detail-ending-section h4 {
+        font-size: 22px;
+    }
+
+    .card-detail-ending {
+        font-size: 20px;
+        line-height: 1.85;
+    }
+}

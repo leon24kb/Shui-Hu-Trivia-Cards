@@ -1,0 +1,82 @@
+/* ===== 网格布局 ===== */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    justify-items: center;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .hero-card {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 3 / 4;
+    }
+
+    .app-title {
+        font-size: 28px;
+        letter-spacing: 4px;
+    }
+
+    .filter-btn {
+        font-size: 14px;
+        padding: 6px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 16px;
+    }
+
+    .hero-card {
+        max-width: 320px;
+        margin: 0 auto;
+    }
+
+    .app-title {
+        font-size: 24px;
+    }
+
+    .filter-nav {
+        gap: 6px;
+    }
+
+    .filter-btn {
+        font-size: 13px;
+        padding: 5px 12px;
+    }
+}
+
+/* ===== 卡片入场动画 ===== */
+@keyframes cardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-card {
+    animation: cardFadeIn 0.4s ease-out;
+}
+
+/* ===== 卡片隐藏/显示过渡 ===== */
+.hero-card.hidden {
+    display: none;
+}
