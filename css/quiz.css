@@ -1,0 +1,2988 @@
+/* ============================================================
+   quiz.css - 水墨风格弹窗系统
+   英雄介绍 / 答题挑战 / 无尽挑战 / 图鉴 / 成就 /
+   头部按钮 / 进度条 / 浮动按钮 / 锁定卡片 /
+   深色模式 / 响应式
+   ============================================================ */
+
+/* ============================
+   0. 通用弹窗基础
+   ============================ */
+
+/* 全屏遮罩 - 通用样式 */
+.quiz-intro-overlay,
+.quiz-challenge-overlay,
+.endless-overlay,
+.collection-overlay,
+.achievement-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: background 0.35s ease;
+}
+
+.quiz-intro-overlay.active,
+.quiz-challenge-overlay.active,
+.endless-overlay.active,
+.collection-overlay.active,
+.achievement-overlay.active {
+    background: rgba(0, 0, 0, 0.6);
+    pointer-events: auto;
+}
+
+/* 内层面板 - 水墨风通用样式 */
+.quiz-intro-panel,
+.quiz-challenge-panel,
+.endless-panel,
+.collection-panel,
+.achievement-panel {
+    position: relative;
+    width: 100%;
+    background: var(--paper-texture);
+    border-radius: 16px;
+    border: 2px solid rgba(139, 69, 19, 0.3);
+    box-shadow: var(--ink-shadow), var(--ink-border);
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 面板内部水墨晕染层 */
+.quiz-intro-panel::after,
+.quiz-challenge-panel::after,
+.endless-panel::after,
+.collection-panel::after,
+.achievement-panel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--ink-gradient);
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 0;
+}
+
+/* 不需要内部滚动的面板设置 overflow:hidden（圆角裁剪） */
+.quiz-intro-panel,
+.quiz-challenge-panel,
+.endless-panel {
+    overflow: hidden;
+}
+
+.quiz-intro-overlay.active .quiz-intro-panel,
+.quiz-challenge-overlay.active .quiz-challenge-panel,
+.endless-overlay.active .endless-panel,
+.collection-overlay.active .collection-panel,
+.achievement-overlay.active .achievement-panel {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* 顶部水墨笔触装饰条 */
+.quiz-intro-panel::before,
+.quiz-challenge-panel::before,
+.endless-panel::before,
+.collection-panel::before,
+.achievement-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: 
+        linear-gradient(90deg, 
+            transparent 0%, 
+            var(--color-ink) 5%, 
+            var(--color-ink) 15%,
+            var(--color-gold-dark) 30%,
+            var(--color-gold) 50%,
+            var(--color-gold-dark) 70%,
+            var(--color-ink) 85%,
+            var(--color-ink) 95%,
+            transparent 100%);
+    z-index: 2;
+    opacity: 0.7;
+}
+
+/* 通用关闭按钮 */
+.panel-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(139, 69, 19, 0.3);
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--color-primary);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    z-index: 10;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    backdrop-filter: blur(4px);
+    line-height: 1;
+}
+
+.panel-close-btn:hover {
+    background: rgba(139, 69, 19, 0.1);
+    border-color: var(--color-primary);
+    transform: scale(1.1);
+}
+
+/* ===== 印章装饰元素 - 水墨风 ===== */
+.seal-decoration {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--seal-red);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-seal);
+    font-size: 14px;
+    color: var(--seal-red);
+    transform: rotate(-8deg);
+    opacity: 0.85;
+    pointer-events: none;
+    box-shadow: var(--seal-shadow);
+    background: rgba(255, 253, 250, 0.9);
+}
+
+.seal-decoration::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border: 1px solid rgba(196, 30, 58, 0.3);
+    border-radius: 2px;
+}
+
+/* 小型印章 */
+.seal-decoration.sm {
+    width: 36px;
+    height: 36px;
+    font-size: 11px;
+}
+
+/* 大型印章 */
+.seal-decoration.lg {
+    width: 60px;
+    height: 60px;
+    font-size: 18px;
+}
+
+/* ============================
+   1. 英雄介绍面板 .quiz-intro
+   ============================ */
+
+.quiz-intro-overlay {
+    z-index: 4000;
+    padding: 20px;
+}
+
+.quiz-intro-panel {
+    max-width: 480px;
+    text-align: center;
+}
+
+/* 剪影图片区 */
+.quiz-intro-portrait {
+    width: 100%;
+    max-width: 200px;
+    height: 240px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.quiz-intro-portrait .quiz-intro-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+/* 信息区 */
+.quiz-intro-info {
+    padding: 0 28px 8px;
+}
+
+.quiz-intro-info .quiz-intro-star-name {
+    font-family: var(--font-brush);
+    font-size: 22px;
+    color: var(--color-ink);
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+    text-shadow: 1px 1px 2px rgba(139, 69, 19, 0.1);
+}
+
+.quiz-intro-info .quiz-intro-stars {
+    font-size: 22px;
+    color: var(--color-gold);
+    letter-spacing: 6px;
+    margin-bottom: 16px;
+    text-shadow: 0 0 8px rgba(218, 165, 32, 0.3);
+}
+
+.quiz-intro-info .quiz-intro-teaser {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--color-ink-light);
+    line-height: 1.8;
+    font-style: italic;
+    padding: 16px 20px;
+    background: 
+        linear-gradient(135deg, 
+            rgba(47, 79, 79, 0.02) 0%, 
+            rgba(139, 69, 19, 0.04) 50%,
+            rgba(47, 79, 79, 0.02) 100%);
+    border-radius: 8px;
+    border: 1px solid rgba(47, 79, 79, 0.1);
+    margin-bottom: 24px;
+}
+
+/* 答题挑战按钮 - 水墨书法风格 */
+.quiz-intro-start-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 280px;
+    min-height: 52px;
+    padding: 14px 32px;
+    border: 2px solid var(--color-ink);
+    border-radius: 8px;
+    background: 
+        linear-gradient(135deg, 
+            rgba(47, 79, 79, 0.9) 0%, 
+            rgba(26, 26, 26, 0.95) 100%);
+    color: var(--color-paper-light);
+    font-family: var(--font-brush);
+    font-size: 20px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 
+        0 4px 16px rgba(47, 79, 79, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    margin-top: 8px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 按钮水墨晕染效果 */
+.quiz-intro-start-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at center, 
+        rgba(218, 165, 32, 0.1) 0%, 
+        transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.quiz-intro-start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 6px 20px rgba(47, 79, 79, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border-color: var(--color-gold-dark);
+}
+
+.quiz-intro-start-btn:hover::before {
+    opacity: 1;
+}
+
+/* 介绍面板关闭按钮 */
+.quiz-intro-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(139, 69, 19, 0.3);
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--color-primary);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    z-index: 10;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    backdrop-filter: blur(4px);
+    line-height: 1;
+}
+
+.quiz-intro-close-btn:hover {
+    background: rgba(139, 69, 19, 0.1);
+    border-color: var(--color-primary);
+    transform: scale(1.1);
+}
+
+.quiz-intro-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 180px;
+    min-height: 48px;
+    padding: 12px 40px;
+    border: 2px solid var(--color-primary);
+    border-radius: 25px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-paper-light);
+    font-family: var(--font-title);
+    font-size: 20px;
+    letter-spacing: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 4px 16px rgba(139, 69, 19, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.quiz-intro-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.5s ease;
+}
+
+.quiz-intro-btn:hover::before {
+    left: 100%;
+}
+
+.quiz-intro-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
+}
+
+.quiz-intro-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+/* ============================
+   2. 答题挑战面板 .quiz-challenge
+   ============================ */
+
+.quiz-challenge-overlay {
+    z-index: 4100;
+    padding: 20px;
+}
+
+.quiz-challenge-panel {
+    max-width: 600px;
+}
+
+/* 退出按钮 - 右上角 */
+.quiz-challenge-exit-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(139, 69, 19, 0.3);
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--color-primary);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    z-index: 10;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    backdrop-filter: blur(4px);
+    line-height: 1;
+    padding: 0;
+}
+
+.quiz-challenge-exit-btn:hover {
+    background: rgba(139, 69, 19, 0.1);
+    border-color: var(--color-primary);
+    transform: scale(1.1);
+}
+
+/* 进度区 - 水墨风格 */
+.quiz-challenge-progress {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px 12px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-ink-light);
+    letter-spacing: 1px;
+}
+
+.quiz-challenge-progress .progress-label {
+    font-family: var(--font-brush);
+    font-weight: 600;
+    color: var(--color-ink);
+}
+
+.quiz-challenge-progress .star-display {
+    color: var(--color-gold);
+    font-size: 18px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 6px rgba(218, 165, 32, 0.3);
+}
+
+/* 答题面板星级 - 居中显示 */
+.quiz-challenge-stars {
+    text-align: center;
+    font-size: 18px;
+    color: var(--color-gold);
+    letter-spacing: 4px;
+    padding: 4px 0 8px;
+}
+
+/* 题目文字 */
+.quiz-challenge-question {
+    font-family: var(--font-body);
+    font-size: 20px;
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 8px 28px 24px;
+    padding: 16px 20px;
+    background: rgba(139, 69, 19, 0.04);
+    border-radius: 10px;
+    border: 1px solid rgba(139, 69, 19, 0.1);
+    text-align: center;
+}
+
+/* 答题拼音标注 */
+.quiz-pinyin {
+    ruby-position: over;
+}
+
+.quiz-pinyin rt {
+    font-size: 11px;
+    color: var(--color-text-light);
+    font-family: 'Noto Sans', sans-serif;
+    line-height: 1.2;
+}
+
+/* 选项容器 */
+.quiz-challenge-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 28px 24px;
+}
+
+/* 选项按钮 - 水墨风格 */
+.quiz-challenge-option-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    min-height: 50px;
+    padding: 12px 18px;
+    border: 1px solid rgba(47, 79, 79, 0.15);
+    border-radius: 8px;
+    background: 
+        linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.7) 0%, 
+            rgba(250, 248, 240, 0.8) 100%);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 2px 8px rgba(47, 79, 79, 0.06);
+}
+
+.quiz-challenge-option-btn:hover {
+    background: 
+        linear-gradient(135deg, 
+            rgba(250, 248, 240, 0.9) 0%, 
+            rgba(245, 240, 224, 0.95) 100%);
+    border-color: var(--color-ink);
+    transform: translateX(4px);
+    box-shadow: 
+        0 4px 12px rgba(47, 79, 79, 0.1),
+        inset 0 0 20px rgba(139, 69, 19, 0.03);
+}
+
+.quiz-challenge-option-btn:active {
+    transform: translateX(2px) scale(0.98);
+}
+
+/* 选项序号 A/B/C/D - 印章风格 */
+.quiz-option-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    background: var(--color-ink);
+    color: var(--color-paper-light);
+    font-family: var(--font-seal);
+    font-size: 16px;
+    font-weight: 600;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 4px rgba(47, 79, 79, 0.2);
+}
+
+/* 选项文字 */
+.quiz-option-text {
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--color-text);
+}
+
+/* 正确选项 */
+.quiz-challenge-option-btn.correct {
+    border-color: #2e7d32;
+    background: rgba(46, 125, 50, 0.08);
+    pointer-events: none;
+}
+
+.quiz-challenge-option-btn.correct .quiz-option-label {
+    background: #2e7d32;
+}
+
+/* 错误选项 */
+.quiz-challenge-option-btn.wrong {
+    border-color: #c62828;
+    background: rgba(198, 40, 40, 0.08);
+    pointer-events: none;
+}
+
+.quiz-challenge-option-btn.wrong .quiz-option-label {
+    background: #c62828;
+}
+
+/* 选项禁用状态 */
+.quiz-challenge-option-btn.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* 结果区 */
+.quiz-challenge-result {
+    margin: 0 28px 24px;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    animation: quizResultFadeIn 0.4s ease;
+}
+
+.quiz-challenge-result.success {
+    background: linear-gradient(135deg, rgba(218, 165, 32, 0.1) 0%, rgba(218, 165, 32, 0.05) 100%);
+    border: 1px solid rgba(218, 165, 32, 0.3);
+}
+
+/* 解锁成功动画（两阶段 - 阶段1：答题面板内） */
+.quiz-challenge-result.unlock-success {
+    animation: unlockSuccessPulse 0.6s ease-out;
+}
+
+.unlock-success-title {
+    font-family: var(--font-title);
+    font-size: 26px;
+    letter-spacing: 4px;
+    color: var(--color-gold-dark);
+    margin-bottom: 8px;
+    animation: unlockTitleBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.unlock-success-name {
+    font-family: var(--font-title);
+    font-size: 32px;
+    letter-spacing: 6px;
+    color: var(--color-primary);
+    animation: unlockNameReveal 1s ease-out 0.3s both;
+}
+
+@keyframes unlockSuccessPulse {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes unlockTitleBounce {
+    0% { transform: scale(0.3) translateY(20px); opacity: 0; }
+    60% { transform: scale(1.1) translateY(-5px); opacity: 1; }
+    100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes unlockNameReveal {
+    0% { transform: translateY(15px); opacity: 0; filter: blur(8px); }
+    100% { transform: translateY(0); opacity: 1; filter: blur(0); }
+}
+
+.quiz-challenge-result.failure {
+    background: linear-gradient(135deg, rgba(139, 0, 0, 0.08) 0%, rgba(139, 0, 0, 0.03) 100%);
+    border: 1px solid rgba(139, 0, 0, 0.2);
+}
+
+/* 正确答案提示 */
+.correct-answer-hint {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 6px 12px;
+    background: rgba(46, 125, 50, 0.1);
+    border-radius: 6px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: #2e7d32;
+}
+
+/* 重试按钮 */
+.quiz-retry-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    min-height: 42px;
+    padding: 10px 28px;
+    margin-top: 14px;
+    border: 2px solid var(--color-primary);
+    border-radius: 21px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-paper-light);
+    font-family: var(--font-title);
+    font-size: 16px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 3px 12px rgba(139, 69, 19, 0.25);
+}
+
+.quiz-retry-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 16px rgba(139, 69, 19, 0.35);
+}
+
+.quiz-retry-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.quiz-challenge-result .result-title {
+    font-family: var(--font-title);
+    font-size: 22px;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+}
+
+.quiz-challenge-result.success .result-title {
+    color: var(--color-gold-dark);
+}
+
+.quiz-challenge-result.failure .result-title {
+    color: var(--color-red);
+}
+
+.quiz-challenge-result .result-hero-name {
+    font-family: var(--font-title);
+    font-size: 28px;
+    color: var(--color-primary);
+    letter-spacing: 4px;
+    margin-top: 4px;
+}
+
+.quiz-challenge-result .result-answer {
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--color-text-light);
+    margin-top: 8px;
+    line-height: 1.6;
+}
+
+/* 重试按钮 */
+.quiz-challenge-retry {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    min-height: 44px;
+    padding: 10px 32px;
+    border: 2px solid var(--color-primary);
+    border-radius: 25px;
+    background: var(--color-primary);
+    color: var(--color-paper-light);
+    font-family: var(--font-body);
+    font-size: 16px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.quiz-challenge-retry:hover {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+}
+
+.quiz-challenge-retry:active {
+    transform: scale(0.96);
+}
+
+/* 粒子效果 */
+.quiz-particle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    animation: particleFade 1.5s ease-out forwards;
+}
+
+@keyframes particleFade {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0) translateY(-60px);
+    }
+}
+
+@keyframes quizResultFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================
+   3. 无尽挑战面板 .endless
+   ============================ */
+
+.endless-overlay {
+    z-index: 4200;
+    padding: 20px;
+}
+
+.endless-panel {
+    max-width: 520px;
+}
+
+/* 挑战模式锁定提示 toast */
+.endless-locked-toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    padding: 14px 28px;
+    background: rgba(139, 69, 19, 0.92);
+    color: var(--color-paper-light);
+    font-family: var(--font-body);
+    font-size: 15px;
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+}
+
+.endless-locked-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* 分数区 */
+.endless-score {
+    text-align: center;
+    padding: 24px 28px 8px;
+}
+
+.endless-score .score-label {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-text-light);
+    letter-spacing: 2px;
+}
+
+.endless-score .score-value {
+    font-family: var(--font-title);
+    font-size: 48px;
+    color: var(--color-gold-dark);
+    letter-spacing: 4px;
+    line-height: 1.2;
+}
+
+/* 连胜区 */
+.endless-streak {
+    text-align: center;
+    padding: 4px 28px 8px;
+}
+
+.endless-streak .streak-label {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--color-text-light);
+    letter-spacing: 1px;
+}
+
+.endless-streak .streak-value {
+    font-family: var(--font-title);
+    font-size: 24px;
+    color: var(--color-red);
+    letter-spacing: 2px;
+}
+
+/* 最高分区 */
+.endless-highscore {
+    text-align: center;
+    padding: 4px 28px 16px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--color-text-light);
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+}
+
+.endless-highscore .highscore-value {
+    color: var(--color-gold);
+    font-weight: 600;
+}
+
+/* 题目 */
+.endless-question {
+    font-family: var(--font-body);
+    font-size: 20px;
+    color: var(--color-text);
+    line-height: 1.8;
+    margin: 16px 28px 20px;
+    padding: 16px 20px;
+    background: rgba(139, 69, 19, 0.04);
+    border-radius: 10px;
+    border: 1px solid rgba(139, 69, 19, 0.1);
+    text-align: center;
+}
+
+/* 选项 */
+.endless-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 28px 24px;
+}
+
+/* 复用选项按钮样式 */
+.endless-options .quiz-option-btn {
+    /* 继承 .quiz-option-btn 样式 */
+}
+
+/* 结果区 */
+.endless-result {
+    margin: 0 28px 20px;
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    animation: quizResultFadeIn 0.4s ease;
+}
+
+.endless-result.success {
+    background: linear-gradient(135deg, rgba(46, 125, 50, 0.08) 0%, rgba(46, 125, 50, 0.03) 100%);
+    border: 1px solid rgba(46, 125, 50, 0.2);
+}
+
+.endless-result.failure {
+    background: linear-gradient(135deg, rgba(198, 40, 40, 0.08) 0%, rgba(198, 40, 40, 0.03) 100%);
+    border: 1px solid rgba(198, 40, 40, 0.2);
+}
+
+.endless-result .result-text {
+    font-family: var(--font-title);
+    font-size: 20px;
+    letter-spacing: 3px;
+}
+
+.endless-result.success .result-text {
+    color: #2e7d32;
+}
+
+.endless-result.failure .result-text {
+    color: #c62828;
+}
+
+/* 重试按钮 */
+.endless-retry {
+    display: block;
+    width: calc(100% - 56px);
+    margin: 0 28px 28px;
+    min-height: 48px;
+    border: 2px solid var(--color-primary);
+    border-radius: 25px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-paper-light);
+    font-family: var(--font-title);
+    font-size: 18px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.endless-retry:hover {
+    box-shadow: 0 4px 16px rgba(139, 69, 19, 0.35);
+    transform: translateY(-1px);
+}
+
+.endless-retry:active {
+    transform: scale(0.97);
+}
+
+/* ============================
+   4. 图鉴面板 .collection
+   ============================ */
+
+.collection-overlay {
+    z-index: 3500;
+    padding: 20px;
+}
+
+.collection-panel {
+    max-width: 900px;
+    width: 94vw;
+    height: 88vh;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 头部 */
+.collection-header {
+    padding: 16px 60px 12px 24px;
+    text-align: center;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(139, 69, 19, 0.12);
+    background: linear-gradient(180deg, rgba(139, 69, 19, 0.04) 0%, transparent 100%);
+    position: relative;
+}
+
+.collection-header .collection-title {
+    font-family: var(--font-brush);
+    font-size: 30px;
+    color: var(--color-ink);
+    letter-spacing: 8px;
+    margin-bottom: 12px;
+    text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.1);
+}
+
+/* 图鉴进度条 - 水墨风格 */
+.collection-progress {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-ink-light);
+    letter-spacing: 2px;
+    padding: 6px 16px;
+    background: 
+        linear-gradient(135deg, 
+            rgba(47, 79, 79, 0.04) 0%, 
+            rgba(139, 69, 19, 0.06) 50%,
+            rgba(47, 79, 79, 0.04) 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(47, 79, 79, 0.1);
+    display: inline-block;
+    margin-top: 4px;
+}
+
+.collection-progress::before {
+    content: '📜 ';
+    opacity: 0.6;
+}
+
+/* 图鉴关闭按钮 - 右上方 */
+.collection-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid rgba(139, 69, 19, 0.3);
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--color-primary);
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    z-index: 20;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    backdrop-filter: blur(4px);
+    line-height: 1;
+}
+
+.collection-close-btn:hover {
+    background: rgba(139, 69, 19, 0.1);
+    border-color: var(--color-primary);
+    transform: scale(1.1);
+}
+
+/* Tab 切换 */
+.collection-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+.collection-tab {
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 8px 24px;
+    border: 2px solid rgba(139, 69, 19, 0.2);
+    border-radius: 25px;
+    background: transparent;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 2px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+.collection-tab:hover {
+    background: rgba(139, 69, 19, 0.06);
+    border-color: var(--color-primary-light);
+}
+
+.collection-tab.active {
+    background: var(--color-primary);
+    color: var(--color-paper-light);
+    border-color: var(--color-primary);
+    box-shadow: 0 3px 10px rgba(139, 69, 19, 0.25);
+}
+
+/* 图鉴内容区域 */
+.collection-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 16px;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 自定义滚动条 */
+.collection-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.collection-body::-webkit-scrollbar-track {
+    background: rgba(139, 69, 19, 0.04);
+}
+
+.collection-body::-webkit-scrollbar-thumb {
+    background: rgba(139, 69, 19, 0.2);
+    border-radius: 3px;
+}
+
+.collection-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 69, 19, 0.35);
+}
+
+/* 英雄网格 */
+.collection-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    justify-items: center;
+}
+
+/* 英雄项 */
+.collection-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 120px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.collection-item:hover {
+    transform: translateY(-3px);
+}
+
+/* 头像 */
+.collection-item img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    border: 3px solid var(--color-gold);
+    box-shadow: 0 3px 10px rgba(139, 69, 19, 0.15);
+    transition: all 0.25s ease;
+    background: var(--color-paper-dark);
+}
+
+/* 名字 */
+.collection-item-name {
+    font-family: var(--font-title);
+    font-size: 14px;
+    color: var(--color-primary);
+    letter-spacing: 2px;
+    text-align: center;
+    line-height: 1.3;
+}
+
+/* 已解锁 */
+.collection-item.unlocked img {
+    border-color: var(--color-gold);
+}
+
+.collection-item.unlocked .collection-item-name {
+    color: var(--color-primary);
+}
+
+/* 未解锁 */
+.collection-item.locked img {
+    border-color: #bbb;
+    background: #e0e0e0;
+    filter: grayscale(1);
+}
+
+.collection-item.locked .collection-item-name {
+    color: #999;
+    font-family: var(--font-body);
+}
+
+/* ============================
+   5. 成就面板 .achievement
+   ============================ */
+
+.achievement-overlay {
+    z-index: 4500;
+    padding: 20px;
+}
+
+.achievement-panel {
+    max-width: 700px;
+    width: 95vw;
+    height: 85vh;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 头部 */
+.achievement-header {
+    padding: 20px 60px 16px 24px;
+    text-align: center;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(139, 69, 19, 0.12);
+    background: linear-gradient(180deg, rgba(139, 69, 19, 0.04) 0%, transparent 100%);
+    position: relative;
+}
+
+.achievement-header .achievement-title {
+    font-family: var(--font-brush);
+    font-size: 30px;
+    color: var(--color-ink);
+    letter-spacing: 8px;
+    text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.1);
+}
+
+.achievement-header .achievement-summary {
+    margin-top: 8px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-ink-light);
+    letter-spacing: 2px;
+    padding: 6px 16px;
+    background: 
+        linear-gradient(135deg, 
+            rgba(47, 79, 79, 0.04) 0%, 
+            rgba(139, 69, 19, 0.06) 50%,
+            rgba(47, 79, 79, 0.04) 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(47, 79, 79, 0.1);
+    display: inline-block;
+}
+
+/* 成就关闭按钮 - 右上方 */
+.achievement-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid rgba(139, 69, 19, 0.3);
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--color-primary);
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    z-index: 20;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    backdrop-filter: blur(4px);
+    line-height: 1;
+}
+
+.achievement-close-btn:hover {
+    background: rgba(139, 69, 19, 0.1);
+    border-color: var(--color-primary);
+    transform: scale(1.1);
+}
+
+/* 成就内容区域 */
+.achievement-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    min-height: 0;
+}
+
+/* 自定义滚动条 */
+.achievement-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.achievement-body::-webkit-scrollbar-track {
+    background: rgba(139, 69, 19, 0.04);
+}
+
+.achievement-body::-webkit-scrollbar-thumb {
+    background: rgba(139, 69, 19, 0.2);
+    border-radius: 3px;
+}
+
+/* 成就列表 */
+.achievement-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+/* 成就项 */
+.achievement-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 12px;
+    border-radius: 12px;
+    border: 2px solid rgba(139, 69, 19, 0.12);
+    background: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    transition: all 0.25s ease;
+}
+
+.achievement-item:hover {
+    border-color: rgba(139, 69, 19, 0.25);
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+    transform: translateY(-2px);
+}
+
+/* 成就图标 */
+.achievement-item-icon {
+    font-size: 40px;
+    line-height: 1;
+}
+
+/* 成就名称 */
+.achievement-item-name {
+    font-family: var(--font-title);
+    font-size: 16px;
+    color: var(--color-primary);
+    letter-spacing: 2px;
+}
+
+/* 成就描述 */
+.achievement-item-desc {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--color-text-light);
+    line-height: 1.5;
+}
+
+/* 已达成 */
+.achievement-item.earned {
+    border-color: rgba(218, 165, 32, 0.3);
+    background: linear-gradient(135deg, rgba(218, 165, 32, 0.06) 0%, rgba(255, 255, 255, 0.5) 100%);
+}
+
+.achievement-item.earned .achievement-item-name {
+    color: var(--color-gold-dark);
+}
+
+/* 未达成 */
+.achievement-item.locked {
+    opacity: 0.5;
+    filter: grayscale(0.6);
+}
+
+.achievement-item.locked .achievement-item-icon {
+    filter: grayscale(1);
+}
+
+.achievement-item.locked .achievement-item-name {
+    color: #999;
+}
+
+.achievement-item.locked .achievement-item-desc {
+    color: #bbb;
+}
+
+/* 成就通知 */
+.achievement-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-120px);
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%);
+    border-radius: 12px;
+    box-shadow:
+        0 8px 30px rgba(218, 165, 32, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: 2px solid var(--color-gold-light);
+    white-space: nowrap;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+}
+
+.achievement-toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.achievement-toast.hide {
+    transform: translateX(-50%) translateY(-120px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 通知图标 */
+.achievement-toast .toast-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+/* 通知文字 */
+.achievement-toast .toast-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.achievement-toast .toast-label {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: rgba(47, 79, 79, 0.7);
+    letter-spacing: 2px;
+}
+
+.achievement-toast .toast-name {
+    font-family: var(--font-title);
+    font-size: 18px;
+    color: var(--color-text);
+    letter-spacing: 2px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* ============================
+   6. 头部按钮 .header-actions
+   ============================ */
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.action-btn {
+    font-family: var(--font-body);
+    font-size: 13px;
+    padding: 5px 14px;
+    border: 1px solid rgba(139, 69, 19, 0.2);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--color-text-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: var(--color-primary-light);
+    color: var(--color-text);
+}
+
+.action-btn:active {
+    transform: scale(0.96);
+}
+
+/* ============================
+   7. 进度条 .progress-bar
+   ============================ */
+
+.progress-bar {
+    flex: 1;
+    height: 16px;
+    background: 
+        linear-gradient(180deg, 
+            rgba(47, 79, 79, 0.08) 0%, 
+            rgba(47, 79, 79, 0.04) 50%,
+            rgba(47, 79, 79, 0.08) 100%);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(47, 79, 79, 0.2);
+    position: relative;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    box-shadow: 
+        inset 0 1px 3px rgba(0, 0, 0, 0.1),
+        0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg,
+        var(--color-ink) 0%,
+        var(--color-ink-light) 20%,
+        var(--color-gold-dark) 50%,
+        var(--color-gold) 80%,
+        var(--color-gold-light) 100%);
+    border-radius: 8px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(218, 165, 32, 0.3);
+}
+
+/* 金色光泽效果 */
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), transparent);
+    border-radius: 8px 8px 0 0;
+}
+
+/* 光泽扫过动画 */
+.progress-fill::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: progressShine 2.5s ease-in-out infinite;
+}
+
+@keyframes progressShine {
+    0% {
+        left: -100%;
+    }
+    50% {
+        left: 100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+.progress-text {
+    font-family: var(--font-brush);
+    font-size: 13px;
+    color: var(--color-ink);
+    white-space: nowrap;
+    font-weight: 600;
+    letter-spacing: 2px;
+    min-width: 60px;
+    text-align: right;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+/* ============================
+   8. 快速导航栏 .quick-navigation
+   ============================ */
+
+.quick-navigation {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(245, 245, 220, 0.95);
+    border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+@media (max-width: 768px) {
+    .quick-navigation {
+        display: flex;
+    }
+}
+
+.quick-navigation .nav-btn {
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 6px 12px;
+    border: 1px solid rgba(139, 69, 19, 0.3);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-width: 44px;
+    text-align: center;
+}
+
+.quick-navigation .nav-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--color-primary);
+}
+
+.quick-navigation .nav-btn:active {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.quick-navigation .nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.quick-navigation .nav-btn.unlocked-btn,
+.quick-navigation .nav-btn.locked-btn {
+    background: linear-gradient(135deg, rgba(218, 165, 32, 0.15), rgba(218, 165, 32, 0.25));
+    border-color: var(--color-gold);
+    color: var(--color-gold-dark);
+    font-weight: 600;
+}
+
+.quick-navigation .nav-btn.unlocked-btn:hover,
+.quick-navigation .nav-btn.locked-btn:hover {
+    background: linear-gradient(135deg, rgba(218, 165, 32, 0.3), rgba(218, 165, 32, 0.4));
+}
+
+.quick-navigation .page-indicator {
+    font-family: var(--font-brush);
+    font-size: 14px;
+    color: var(--color-ink);
+    padding: 0 8px;
+    min-width: 50px;
+    text-align: center;
+}
+
+/* 深色模式下的快速导航栏 */
+body.dark-mode .quick-navigation {
+    background: rgba(26, 26, 46, 0.95);
+    border-color: rgba(192, 120, 74, 0.3);
+}
+
+body.dark-mode .quick-navigation .nav-btn {
+    background: rgba(34, 34, 68, 0.8);
+    border-color: rgba(192, 120, 74, 0.4);
+    color: var(--color-gold);
+}
+
+body.dark-mode .quick-navigation .nav-btn:hover {
+    background: rgba(34, 34, 68, 1);
+    border-color: var(--color-gold);
+}
+
+body.dark-mode .quick-navigation .nav-btn:active {
+    background: var(--color-gold);
+    color: #1a1a2e;
+}
+
+body.dark-mode .quick-navigation .page-indicator {
+    color: #d4d4d4;
+}
+
+/* 解锁高亮动画 */
+@keyframes unlockGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(218, 165, 32, 0);
+    }
+    50% {
+        box-shadow: 0 0 20px 5px rgba(218, 165, 32, 0.8);
+    }
+}
+
+.hero-card.card-unlock-highlight {
+    animation: unlockGlow 0.8s ease-in-out 3;
+    z-index: 1000;
+}
+
+/* ============================
+   8. 浮动按钮容器 .floating-btn-container
+   ============================ */
+
+.floating-btn-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 3000;
+}
+
+.pinyin-toggle,
+.dark-mode-toggle {
+    font-family: var(--font-body);
+    font-size: 13px;
+    padding: 6px 14px;
+    border: 1px solid rgba(139, 69, 19, 0.3);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.4);
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pinyin-toggle:hover,
+.dark-mode-toggle:hover {
+    background: rgba(139, 69, 19, 0.1);
+    border-color: var(--color-primary);
+}
+
+.pinyin-toggle.active {
+    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    color: #fff;
+    border-color: #2e7d32;
+}
+
+/* ============================
+   9. 锁定卡片 .hero-card.locked
+   ============================ */
+
+.hero-card.locked {
+    position: relative;
+    cursor: pointer;
+}
+
+/* 不使用蒙层和锁图标，直接显示模板图片 */
+.hero-card.locked::before,
+.hero-card.locked::after {
+    display: none;
+}
+
+/* 锁定卡片正面 */
+.locked-front {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+}
+
+.locked-front .card-image-container {
+    width: 100%;
+    height: 100%;
+}
+
+/* 锁定图片 - 填充整个卡片 */
+.locked-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    filter: grayscale(0.3);
+}
+
+/* 锁定文字 - 位于图片上半部分留白处，横向上下结构，书法水墨风格（优化 iOS） */
+.locked-text {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-family: 'KaiTi', 'STKaiti', 'BiauKai', 'Xingkai SC', 'Hiragino Sans GB', 'PingFang SC', serif;
+    text-align: center;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.locked-text-top {
+    font-size: 26px;
+    letter-spacing: 6px;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-shadow: 
+        1px 1px 2px rgba(255,255,255,0.9),
+        2px 2px 4px rgba(255,255,255,0.6),
+        0 0 15px rgba(0,0,0,0.08);
+    -webkit-text-stroke: 0.3px rgba(139, 69, 19, 0.2);
+}
+
+.locked-text-bottom {
+    font-size: 20px;
+    letter-spacing: 4px;
+    color: #4a3728;
+    text-shadow: 
+        1px 1px 2px rgba(255,255,255,0.95),
+        1px 1px 4px rgba(255,255,255,0.7),
+        0 0 10px rgba(0,0,0,0.05);
+}
+
+/* 锁定卡片悬停效果 */
+.hero-card.locked:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(139, 69, 19, 0.2);
+}
+
+.hero-card.locked:hover .locked-front {
+    border-color: rgba(139, 69, 19, 0.3);
+}
+
+/* ============================
+   10. 深色模式 body.dark-mode
+   ============================ */
+
+body.dark-mode {
+    --color-paper: #1a1a2e;
+    --color-paper-dark: #16213e;
+    --color-paper-light: #222244;
+    --color-text: #d4d4d4;
+    --color-text-light: #a0a0a0;
+    --color-ink: #c8c8c8;
+    --color-ink-light: #b0b0b0;
+    --color-border: #6B3410;
+    --color-shadow: rgba(0, 0, 0, 0.4);
+    --color-primary-light: #c0784a;
+    --color-gold: #e8b830;
+    --color-gold-light: #ffe066;
+    background: #1a1a2e;
+    color: #d4d4d4;
+    overscroll-behavior-y: contain;
+}
+
+/* 深色模式 - 宣纸纹理覆盖 */
+body.dark-mode::before {
+    background:
+        linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 50%, rgba(34, 34, 68, 0.9) 100%);
+}
+
+body.dark-mode::after {
+    background:
+        radial-gradient(ellipse at 10% 20%, rgba(218, 165, 32, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 80%, rgba(218, 165, 32, 0.03) 0%, transparent 50%);
+}
+
+/* 深色模式 - 头部 */
+body.dark-mode .app-header {
+    background: linear-gradient(180deg, rgba(218, 165, 32, 0.06) 0%, transparent 100%);
+    border-bottom-color: rgba(218, 165, 32, 0.15);
+}
+
+body.dark-mode .app-header::before,
+body.dark-mode .app-header::after {
+    background: #1a1a2e;
+}
+
+body.dark-mode .app-title {
+    color: var(--color-gold);
+    text-shadow:
+        2px 2px 0 rgba(0, 0, 0, 0.3),
+        -1px -1px 0 rgba(218, 165, 32, 0.1);
+}
+
+body.dark-mode .app-title::before,
+body.dark-mode .app-title::after {
+    color: var(--color-gold-light);
+}
+
+/* 深色模式 - 筛选按钮 */
+body.dark-mode .filter-btn {
+    border-color: rgba(218, 165, 32, 0.4);
+    color: var(--color-gold);
+}
+
+body.dark-mode .filter-btn:hover {
+    background: rgba(218, 165, 32, 0.1);
+    border-color: var(--color-gold);
+}
+
+body.dark-mode .filter-btn.active {
+    background: var(--color-gold-dark);
+    color: #1a1a2e;
+    border-color: var(--color-gold-dark);
+}
+
+/* 深色模式 - 排序按钮 */
+body.dark-mode .sort-btn {
+    border-color: rgba(218, 165, 32, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-light);
+}
+
+body.dark-mode .sort-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-gold);
+    color: var(--color-text);
+}
+
+body.dark-mode .sort-btn.active {
+    background: var(--color-gold-dark);
+    color: #1a1a2e;
+    border-color: var(--color-gold-dark);
+}
+
+/* 深色模式 - 工具按钮 */
+body.dark-mode .tool-btn {
+    border-color: rgba(218, 165, 32, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-gold);
+}
+
+body.dark-mode .tool-btn:hover {
+    background: rgba(218, 165, 32, 0.1);
+    border-color: var(--color-gold);
+}
+
+body.dark-mode .tool-btn.active {
+    background: var(--color-gold-dark);
+    color: #1a1a2e;
+}
+
+/* 深色模式 - 卡片 */
+body.dark-mode .card-front {
+    background: #222244;
+}
+
+body.dark-mode .card-back {
+    background: linear-gradient(180deg, #222244 0%, #1e1e3a 100%);
+}
+
+body.dark-mode .card-front::before,
+body.dark-mode .card-back::before {
+    border-color: rgba(218, 165, 32, 0.15);
+}
+
+body.dark-mode .hero-card:hover {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .story-text {
+    color: #c0c0c0;
+}
+
+body.dark-mode .ending-text {
+    color: #a0a0a0;
+}
+
+body.dark-mode .info-item {
+    color: #c0c0c0;
+}
+
+body.dark-mode .story-section h4 {
+    color: var(--color-gold);
+    border-bottom-color: rgba(218, 165, 32, 0.15);
+}
+
+body.dark-mode .ending-section {
+    background: rgba(139, 0, 0, 0.08);
+    border-left-color: var(--color-red-light);
+}
+
+body.dark-mode .ending-section h4 {
+    color: var(--color-red-light);
+}
+
+/* 深色模式 - 弹窗面板通用 */
+body.dark-mode .quiz-intro-panel,
+body.dark-mode .quiz-challenge-panel,
+body.dark-mode .endless-panel,
+body.dark-mode .collection-panel,
+body.dark-mode .achievement-panel {
+    background: linear-gradient(180deg, #222244 0%, #1e1e3a 100%);
+    border-color: var(--color-gold-dark);
+}
+
+/* 深色模式 - 英雄介绍面板 */
+body.dark-mode .quiz-intro-info .hero-suspense-desc {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(218, 165, 32, 0.15);
+    color: var(--color-text);
+}
+
+body.dark-mode .quiz-intro-btn {
+    background: linear-gradient(135deg, var(--color-gold-dark) 0%, var(--color-gold) 100%);
+    color: #1a1a2e;
+    border-color: var(--color-gold-dark);
+}
+
+body.dark-mode .quiz-intro-btn:hover {
+    box-shadow: 0 6px 20px rgba(218, 165, 32, 0.4);
+}
+
+/* 深色模式 - 答题挑战面板 */
+body.dark-mode .quiz-challenge-progress {
+    color: var(--color-text-light);
+}
+
+body.dark-mode .quiz-challenge-progress .progress-label {
+    color: var(--color-gold);
+}
+
+body.dark-mode .quiz-challenge-question {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(218, 165, 32, 0.15);
+    color: var(--color-text);
+}
+
+body.dark-mode .quiz-option-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(218, 165, 32, 0.2);
+    color: var(--color-text);
+}
+
+body.dark-mode .quiz-option-btn:hover {
+    background: rgba(218, 165, 32, 0.08);
+    border-color: var(--color-gold);
+}
+
+body.dark-mode .quiz-option-btn.correct {
+    border-color: #4caf50;
+    background: rgba(76, 175, 80, 0.12);
+}
+
+body.dark-mode .quiz-option-btn.correct .option-label {
+    background: #4caf50;
+}
+
+body.dark-mode .quiz-option-btn.wrong {
+    border-color: #ef5350;
+    background: rgba(239, 83, 80, 0.12);
+}
+
+body.dark-mode .quiz-option-btn.wrong .option-label {
+    background: #ef5350;
+}
+
+body.dark-mode .quiz-challenge-result.success {
+    background: linear-gradient(135deg, rgba(218, 165, 32, 0.12) 0%, rgba(218, 165, 32, 0.04) 100%);
+    border-color: rgba(218, 165, 32, 0.3);
+}
+
+body.dark-mode .quiz-challenge-result.failure {
+    background: linear-gradient(135deg, rgba(139, 0, 0, 0.12) 0%, rgba(139, 0, 0, 0.04) 100%);
+    border-color: rgba(139, 0, 0, 0.3);
+}
+
+body.dark-mode .quiz-challenge-result .result-hero-name {
+    color: var(--color-gold);
+}
+
+body.dark-mode .quiz-challenge-result .result-answer {
+    color: var(--color-text-light);
+}
+
+body.dark-mode .quiz-challenge-retry {
+    background: var(--color-gold-dark);
+    color: #1a1a2e;
+    border-color: var(--color-gold-dark);
+}
+
+body.dark-mode .quiz-challenge-retry:hover {
+    background: var(--color-gold);
+}
+
+/* 深色模式 - 无尽挑战面板 */
+body.dark-mode .endless-score .score-value {
+    color: var(--color-gold);
+}
+
+body.dark-mode .endless-streak .streak-value {
+    color: var(--color-red-light);
+}
+
+body.dark-mode .endless-highscore {
+    color: var(--color-text-light);
+    border-bottom-color: rgba(218, 165, 32, 0.1);
+}
+
+body.dark-mode .endless-question {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(218, 165, 32, 0.15);
+    color: var(--color-text);
+}
+
+body.dark-mode .endless-result.success {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.04) 100%);
+    border-color: rgba(76, 175, 80, 0.25);
+}
+
+body.dark-mode .endless-result.failure {
+    background: linear-gradient(135deg, rgba(239, 83, 80, 0.1) 0%, rgba(239, 83, 80, 0.04) 100%);
+    border-color: rgba(239, 83, 80, 0.25);
+}
+
+body.dark-mode .endless-retry {
+    background: linear-gradient(135deg, var(--color-gold-dark) 0%, var(--color-gold) 100%);
+    color: #1a1a2e;
+    border-color: var(--color-gold-dark);
+}
+
+/* 深色模式 - 图鉴面板 */
+body.dark-mode .collection-header {
+    border-bottom-color: rgba(218, 165, 32, 0.15);
+    background: linear-gradient(180deg, rgba(218, 165, 32, 0.04) 0%, transparent 100%);
+}
+
+body.dark-mode .collection-header .collection-title {
+    color: var(--color-gold);
+}
+
+body.dark-mode .collection-tab {
+    border-color: rgba(218, 165, 32, 0.3);
+    color: var(--color-gold);
+}
+
+body.dark-mode .collection-tab:hover {
+    background: rgba(218, 165, 32, 0.08);
+    border-color: var(--color-gold);
+}
+
+body.dark-mode .collection-tab.active {
+    background: var(--color-gold-dark);
+    color: #1a1a2e;
+    border-color: var(--color-gold-dark);
+}
+
+body.dark-mode .collection-item img {
+    border-color: var(--color-gold-dark);
+}
+
+body.dark-mode .collection-item-name {
+    color: var(--color-gold);
+}
+
+body.dark-mode .collection-item.locked img {
+    background: #333;
+    border-color: #555;
+}
+
+body.dark-mode .collection-item.locked .collection-item-name {
+    color: #666;
+}
+
+/* 深色模式 - 成就面板 */
+body.dark-mode .achievement-header {
+    border-bottom-color: rgba(218, 165, 32, 0.15);
+    background: linear-gradient(180deg, rgba(218, 165, 32, 0.04) 0%, transparent 100%);
+}
+
+body.dark-mode .achievement-header .achievement-title {
+    color: var(--color-gold);
+}
+
+body.dark-mode .achievement-item {
+    border-color: rgba(218, 165, 32, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-mode .achievement-item:hover {
+    border-color: rgba(218, 165, 32, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .achievement-item.earned {
+    border-color: rgba(218, 165, 32, 0.3);
+    background: linear-gradient(135deg, rgba(218, 165, 32, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+}
+
+body.dark-mode .achievement-item.earned .achievement-item-name {
+    color: var(--color-gold);
+}
+
+body.dark-mode .achievement-item.locked .achievement-item-name {
+    color: #555;
+}
+
+body.dark-mode .achievement-item.locked .achievement-item-desc {
+    color: #444;
+}
+
+/* 深色模式 - 关闭按钮 */
+body.dark-mode .panel-close-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(218, 165, 32, 0.3);
+    color: var(--color-gold);
+}
+
+body.dark-mode .panel-close-btn:hover {
+    background: rgba(218, 165, 32, 0.15);
+    border-color: var(--color-gold);
+}
+
+/* 深色模式 - 进度条 */
+body.dark-mode .progress-bar {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(218, 165, 32, 0.2);
+}
+
+body.dark-mode .progress-text {
+    color: var(--color-gold);
+}
+
+/* 深色模式 - 头部按钮 */
+body.dark-mode .action-btn {
+    border-color: rgba(218, 165, 32, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-gold);
+}
+
+body.dark-mode .action-btn:hover {
+    background: rgba(218, 165, 32, 0.1);
+    border-color: var(--color-gold);
+}
+
+/* 深色模式 - 浮动按钮 */
+body.dark-mode .pinyin-toggle {
+    background: linear-gradient(135deg, #3a3a5c 0%, #4a4a6c 100%);
+    border: 1px solid rgba(218, 165, 32, 0.3);
+    color: var(--color-gold);
+}
+
+body.dark-mode .pinyin-toggle.active {
+    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    color: #fff;
+    border-color: #2e7d32;
+}
+
+body.dark-mode .dark-mode-toggle {
+    border-color: rgba(218, 165, 32, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-gold);
+}
+
+body.dark-mode .dark-mode-toggle:hover {
+    background: rgba(218, 165, 32, 0.1);
+    border-color: var(--color-gold);
+}
+
+/* 深色模式 - 锁定卡片 */
+body.dark-mode .locked-front {
+    background: linear-gradient(180deg, #222244 0%, #1e1e3a 100%);
+    border-color: rgba(218, 165, 32, 0.15);
+}
+
+body.dark-mode .locked-image {
+    opacity: 0.4;
+    filter: grayscale(0.7);
+}
+
+body.dark-mode .locked-text {
+    color: #D4A574;
+    text-shadow: 
+        0 0 4px rgba(0,0,0,0.8),
+        0 0 8px rgba(0,0,0,0.6),
+        1px 1px 2px rgba(0,0,0,0.7);
+}
+
+/* 深色模式 - 卡片详情弹窗 */
+body.dark-mode .card-detail-panel {
+    background: linear-gradient(180deg, #222244 0%, #1e1e3a 100%);
+}
+
+body.dark-mode .card-detail-header {
+    background: linear-gradient(135deg, rgba(218, 165, 32, 0.06) 0%, rgba(218, 165, 32, 0.03) 100%);
+    border-bottom-color: rgba(218, 165, 32, 0.15);
+}
+
+body.dark-mode .card-detail-nickname {
+    color: var(--color-gold);
+}
+
+body.dark-mode .card-detail-name {
+    color: var(--color-gold);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .card-detail-star {
+    color: var(--color-text-light);
+}
+
+body.dark-mode .detail-info-tag {
+    color: var(--color-gold);
+    background: rgba(218, 165, 32, 0.06);
+    border-color: rgba(218, 165, 32, 0.2);
+}
+
+body.dark-mode .card-detail-story-section h4 {
+    color: var(--color-gold);
+    border-bottom-color: rgba(218, 165, 32, 0.15);
+}
+
+body.dark-mode .card-detail-story {
+    color: #c0c0c0;
+}
+
+body.dark-mode .card-detail-ending-section {
+    background: rgba(139, 0, 0, 0.08);
+    border-left-color: var(--color-red-light);
+}
+
+body.dark-mode .card-detail-ending-section h4 {
+    color: var(--color-red-light);
+}
+
+body.dark-mode .card-detail-ending {
+    color: #a0a0a0;
+}
+
+body.dark-mode .card-detail-portrait {
+    border-color: var(--color-gold-dark);
+}
+
+body.dark-mode .card-detail-enlarge-btn {
+    color: var(--color-gold);
+    border-color: rgba(218, 165, 32, 0.3);
+}
+
+/* 深色模式 - 图片放大弹窗 */
+body.dark-mode .front-image-modal {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+body.dark-mode .front-image-modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================
+   11. 响应式适配
+   ============================ */
+
+/* --- 平板适配 (max-width: 768px) --- */
+@media (max-width: 768px) {
+
+    /* 英雄介绍面板 */
+    .quiz-intro-panel {
+        max-width: 440px;
+    }
+
+    .quiz-intro-silhouette {
+        max-width: 160px;
+        height: 200px;
+    }
+
+    .quiz-intro-info {
+        padding: 0 20px 8px;
+    }
+
+    .quiz-intro-info .hero-suspense-desc {
+        font-size: 15px;
+        padding: 14px 16px;
+    }
+
+    /* 答题挑战面板 */
+    .quiz-challenge-panel {
+        max-width: 480px;
+    }
+
+    .quiz-challenge-progress {
+        padding: 16px 20px 10px;
+    }
+
+    .quiz-challenge-question {
+        font-size: 18px;
+        padding: 14px 16px;
+        margin: 8px 20px 20px;
+    }
+
+    .quiz-challenge-options {
+        padding: 0 20px 20px;
+    }
+
+    .quiz-option-btn {
+        min-height: 48px;
+        padding: 10px 16px;
+        font-size: 16px;
+    }
+
+    .quiz-challenge-result {
+        margin: 0 20px 20px;
+    }
+
+    .quiz-challenge-result .result-title {
+        font-size: 20px;
+    }
+
+    .quiz-challenge-result .result-hero-name {
+        font-size: 24px;
+    }
+
+    /* 无尽挑战面板 */
+    .endless-panel {
+        max-width: 480px;
+    }
+
+    .endless-score .score-value {
+        font-size: 40px;
+    }
+
+    .endless-question {
+        font-size: 18px;
+        padding: 14px 16px;
+        margin: 12px 20px 16px;
+    }
+
+    .endless-options {
+        padding: 0 20px 20px;
+    }
+
+    .endless-result {
+        margin: 0 20px 16px;
+    }
+
+    .endless-retry {
+        width: calc(100% - 40px);
+        margin: 0 20px 20px;
+    }
+
+    /* 图鉴面板 */
+    .collection-panel {
+        max-width: 96vw;
+        height: 90vh;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+
+    .collection-header {
+        padding: 12px 50px 8px 16px;
+    }
+
+    .collection-header .collection-title {
+        font-size: 24px;
+        letter-spacing: 4px;
+        margin-bottom: 6px;
+    }
+
+    .collection-tabs {
+        gap: 6px;
+        margin-bottom: 4px;
+    }
+
+    .collection-tab {
+        font-size: 13px;
+        padding: 6px 18px;
+        min-height: 38px;
+    }
+
+    .collection-body {
+        padding: 8px 10px;
+    }
+
+    .collection-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .collection-item img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .collection-item-name {
+        font-size: 11px;
+    }
+
+    .collection-body {
+        padding: 16px;
+    }
+
+    /* 成就面板 */
+    .achievement-panel {
+        max-width: 95vw;
+        max-height: 88vh;
+        border-radius: 12px;
+    }
+
+    .achievement-header {
+        padding: 18px 16px 12px;
+    }
+
+    .achievement-header .achievement-title {
+        font-size: 24px;
+        letter-spacing: 4px;
+    }
+
+    .achievement-list {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .achievement-item {
+        padding: 16px 10px;
+    }
+
+    .achievement-item-icon {
+        font-size: 34px;
+    }
+
+    .achievement-item-name {
+        font-size: 15px;
+    }
+
+    .achievement-item-desc {
+        font-size: 12px;
+    }
+
+    /* 进度条 */
+    .progress-bar {
+        height: 10px;
+    }
+
+    .progress-text {
+        font-size: 13px;
+    }
+
+    /* 浮动按钮 */
+    .floating-btn-container {
+        bottom: 16px;
+        right: 16px;
+    }
+
+    /* 成就通知 */
+    .achievement-toast {
+        padding: 12px 20px;
+        gap: 10px;
+    }
+
+    .achievement-toast .toast-icon {
+        font-size: 24px;
+    }
+
+    .achievement-toast .toast-name {
+        font-size: 16px;
+    }
+}
+
+/* --- 手机适配 (max-width: 480px) --- */
+@media (max-width: 480px) {
+
+    /* 手机端弹窗从底部滑入 */
+    .quiz-intro-overlay,
+    .quiz-challenge-overlay,
+    .endless-overlay,
+    .achievement-overlay {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .quiz-intro-panel,
+    .quiz-challenge-panel,
+    .endless-panel,
+    .achievement-panel {
+        width: 100%;
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: 16px 16px 0 0;
+        transform: translateY(100%);
+        opacity: 1;
+    }
+
+    .quiz-intro-overlay.active .quiz-intro-panel,
+    .quiz-challenge-overlay.active .quiz-challenge-panel,
+    .endless-overlay.active .endless-panel,
+    .achievement-overlay.active .achievement-panel {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    /* 图鉴面板 - 手机端全屏 */
+    .collection-overlay {
+        padding: 0;
+    }
+
+    .collection-panel {
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        border-radius: 0;
+        border: none;
+        transform: translateY(100%);
+        opacity: 1;
+    }
+
+    .collection-overlay.active .collection-panel {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    /* 英雄介绍面板 */
+    .quiz-intro-panel {
+        overflow-y: auto;
+    }
+
+    .quiz-intro-silhouette {
+        max-width: 120px;
+        height: 160px;
+        margin-bottom: 16px;
+    }
+
+    .quiz-intro-info {
+        padding: 0 16px 8px;
+    }
+
+    .quiz-intro-info .hero-suspense-desc {
+        font-size: 14px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+    }
+
+    .quiz-intro-btn {
+        width: calc(100% - 32px);
+        margin: 0 16px 24px;
+        min-height: 48px;
+    }
+
+    /* 答题介绍面板 - 解锁英雄按钮 */
+    .quiz-intro-start-btn {
+        width: calc(100% - 32px);
+        min-width: auto;
+        min-height: 52px;
+        margin: 4px 16px 20px;
+        padding: 14px 24px;
+        font-size: 17px;
+        letter-spacing: 2px;
+    }
+
+    /* 答题挑战面板 */
+    .quiz-challenge-panel {
+        overflow-y: auto;
+    }
+
+    .quiz-challenge-progress {
+        padding: 16px 16px 8px;
+        font-size: 13px;
+    }
+
+    .quiz-challenge-question {
+        font-size: 16px;
+        padding: 12px 14px;
+        margin: 8px 16px 16px;
+    }
+
+    .quiz-challenge-options {
+        padding: 0 16px 16px;
+        gap: 10px;
+    }
+
+    .quiz-option-btn {
+        min-height: 50px;
+        padding: 12px 14px;
+        font-size: 15px;
+        border-radius: 10px;
+    }
+
+    .quiz-option-btn .option-label {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .quiz-challenge-result {
+        margin: 0 16px 16px;
+        padding: 16px;
+    }
+
+    .quiz-challenge-result .result-title {
+        font-size: 18px;
+    }
+
+    .quiz-challenge-result .result-hero-name {
+        font-size: 22px;
+    }
+
+    .quiz-challenge-retry {
+        width: calc(100% - 32px);
+        margin: 0 16px 20px;
+    }
+
+    /* 无尽挑战面板 */
+    .endless-panel {
+        overflow-y: auto;
+    }
+
+    .endless-score {
+        padding: 16px 16px 4px;
+    }
+
+    .endless-score .score-value {
+        font-size: 36px;
+    }
+
+    .endless-streak {
+        padding: 4px 16px 4px;
+    }
+
+    .endless-highscore {
+        padding: 4px 16px 12px;
+    }
+
+    .endless-question {
+        font-size: 16px;
+        padding: 12px 14px;
+        margin: 12px 16px 16px;
+    }
+
+    .endless-options {
+        padding: 0 16px 16px;
+        gap: 10px;
+    }
+
+    .endless-result {
+        margin: 0 16px 12px;
+        padding: 14px;
+    }
+
+    .endless-retry {
+        width: calc(100% - 32px);
+        margin: 0 16px 20px;
+    }
+
+    /* 图鉴面板 */
+    .collection-header {
+        padding: 16px 12px 10px;
+    }
+
+    .collection-header .collection-title {
+        font-size: 22px;
+        letter-spacing: 3px;
+        margin-bottom: 12px;
+    }
+
+    .collection-tabs {
+        gap: 4px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .collection-tab {
+        font-size: 12px;
+        padding: 6px 14px;
+        min-height: 40px;
+    }
+
+    .collection-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .collection-item img {
+        width: 52px;
+        height: 52px;
+    }
+
+    .collection-item-name {
+        font-size: 11px;
+    }
+
+    .collection-body {
+        padding: 12px;
+    }
+
+    /* 成就面板 */
+    .achievement-panel {
+        overflow-y: auto;
+    }
+
+    .achievement-header {
+        padding: 16px 14px 10px;
+    }
+
+    .achievement-header .achievement-title {
+        font-size: 22px;
+        letter-spacing: 3px;
+    }
+
+    .achievement-list {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .achievement-item {
+        padding: 14px 8px;
+    }
+
+    .achievement-item-icon {
+        font-size: 30px;
+    }
+
+    .achievement-item-name {
+        font-size: 14px;
+    }
+
+    .achievement-item-desc {
+        font-size: 11px;
+    }
+
+    .achievement-body {
+        padding: 14px;
+    }
+
+    /* 关闭按钮 */
+    .panel-close-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 24px;
+    }
+
+    /* 头部按钮 */
+    .header-actions {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .action-btn {
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+
+    /* 进度条 */
+    .progress-bar {
+        height: 10px;
+    }
+
+    .progress-text {
+        font-size: 12px;
+        min-width: 40px;
+    }
+
+    /* 浮动按钮 */
+    .floating-btn-container {
+        bottom: 12px;
+        right: 12px;
+        gap: 8px;
+    }
+
+    .pinyin-toggle,
+    .dark-mode-toggle {
+        font-size: 12px;
+        padding: 5px 10px;
+        min-height: 40px;
+    }
+
+    /* 锁定卡片 */
+    .locked-image {
+        object-fit: cover;
+        object-position: center center;
+    }
+
+    .locked-text {
+        top: 6%;
+        gap: 2px;
+    }
+    .locked-text-top {
+        font-size: 18px;
+        letter-spacing: 3px;
+        font-weight: 600;
+        -webkit-text-stroke: 0.2px rgba(139, 69, 19, 0.15);
+    }
+    .locked-text-bottom {
+        font-size: 14px;
+        letter-spacing: 2px;
+    }
+
+    /* iOS 设备专用优化 */
+    @supports (-webkit-touch-callout: none) {
+        .locked-text {
+            font-family: 'Xingkai SC', 'KaiTi', 'STKaiti', 'PingFang SC', serif;
+        }
+        .locked-text-top {
+            font-weight: 500;
+            -webkit-text-stroke: 0.2px rgba(60, 60, 60, 0.15);
+        }
+    }
+
+    /* 成就通知 - 手机端适配 */
+    .achievement-toast {
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        transform: translateY(-120px);
+        padding: 12px 16px;
+        white-space: normal;
+    }
+
+    .achievement-toast.show {
+        transform: translateY(0);
+    }
+
+    .achievement-toast.hide {
+        transform: translateY(-120px);
+    }
+
+    .achievement-toast .toast-icon {
+        font-size: 22px;
+    }
+
+    .achievement-toast .toast-label {
+        font-size: 11px;
+    }
+
+    .achievement-toast .toast-name {
+        font-size: 15px;
+    }
+}
+
+/* ============================
+   12. 通用动画 & 工具类
+   ============================ */
+
+/* 淡入动画 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 从下方滑入 */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 缩放弹入 */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* 金色闪光效果（解锁时） */
+@keyframes goldShine {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+.unlock-shine {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(218, 165, 32, 0.3) 45%,
+        rgba(255, 215, 0, 0.5) 50%,
+        rgba(218, 165, 32, 0.3) 55%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: goldShine 1.5s ease-in-out;
+}
+
+/* 无障碍 - 减少动画 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

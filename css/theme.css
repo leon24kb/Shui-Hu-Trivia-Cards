@@ -1,0 +1,318 @@
+/* ===== 水浒典藏主题 - 水墨风优化版 ===== */
+:root {
+    /* 主色调 - 古籍褐 */
+    --color-primary: #8B4513;
+    --color-primary-light: #A0522D;
+    --color-primary-dark: #6B3410;
+
+    /* 强调色 - 鎏金 */
+    --color-gold: #DAA520;
+    --color-gold-light: #FFD700;
+    --color-gold-dark: #B8860B;
+
+    /* 背景色 - 宣纸米 */
+    --color-paper: #F5F5DC;
+    --color-paper-dark: #E8DCC0;
+    --color-paper-light: #FFFEF5;
+
+    /* 文字色 - 墨色 */
+    --color-ink: #2F4F4F;
+    --color-ink-light: #3F5F5F;
+    --color-ink-deep: #1a1a1a;
+
+    /* 点缀色 - 朱砂 */
+    --color-red: #8B0000;
+    --color-red-light: #CD5C5C;
+    --color-red-dark: #5C0000;
+
+    /* 辅助色 */
+    --color-text: #333333;
+    --color-text-light: #666666;
+    --color-border: #8B4513;
+    --color-shadow: rgba(139, 69, 19, 0.2);
+
+    /* ===== 水墨风专用变量 ===== */
+    /* 水墨渐变 */
+    --ink-gradient: linear-gradient(135deg, 
+        rgba(47, 79, 79, 0.03) 0%, 
+        rgba(139, 69, 19, 0.05) 50%, 
+        rgba(47, 79, 79, 0.03) 100%);
+    
+    /* 宣纸纹理 - 使用多层渐变模拟 */
+    --paper-texture: 
+        radial-gradient(ellipse at 20% 30%, rgba(139, 69, 19, 0.02) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(47, 79, 79, 0.02) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(218, 165, 32, 0.01) 0%, transparent 70%),
+        linear-gradient(180deg, #faf8f0 0%, #f5f0e0 50%, #f0ebe0 100%);
+    
+    /* 水墨晕染边框 */
+    --ink-border: 
+        0 0 0 1px rgba(139, 69, 19, 0.15),
+        0 0 20px rgba(47, 79, 79, 0.08),
+        0 4px 12px rgba(0, 0, 0, 0.1);
+    
+    /* 水墨阴影 */
+    --ink-shadow: 
+        0 8px 32px rgba(47, 79, 79, 0.12),
+        0 2px 8px rgba(139, 69, 19, 0.08);
+    
+    /* 印章红色 */
+    --seal-red: #C41E3A;
+    --seal-shadow: 0 2px 4px rgba(196, 30, 58, 0.3);
+    
+    /* 毛笔笔触效果 */
+    --brush-stroke: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(139, 69, 19, 0.1) 10%, 
+        rgba(139, 69, 19, 0.15) 50%, 
+        rgba(139, 69, 19, 0.1) 90%, 
+        transparent 100%);
+
+    /* 卡片尺寸 */
+    --card-width: 300px;
+    --card-height: 400px;
+    --border-radius: 10px;
+
+    /* 字体 - 水墨书法风格（优化 iOS 支持） */
+    --font-title: "Ma Shan Zheng", "马善政", "ZCOOL KuaiLe", "站酷快乐体", "KaiTi", "STKaiti", "BiauKai", "Hiragino Sans GB", "PingFang SC", cursive;
+    --font-body: "Noto Serif SC", "思源宋体", "KaiTi", "STKaiti", "BiauKai", "Hiragino Sans GB", "PingFang SC", "FangSong", serif;
+    --font-seal: "ZCOOL XiaoWei", "站酷小薇", "SimSun", "Songti SC", "Hiragino Sans GB", serif;
+    --font-brush: "Ma Shan Zheng", "马善政", "STXingkai", "Xingkai SC", "KaiTi", "STKaiti", "BiauKai", "Hiragino Sans GB", "PingFang SC", cursive;
+}
+
+/* ===== 全局重置 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    overscroll-behavior-y: contain;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--color-paper);
+    min-height: 100vh;
+    color: var(--color-text);
+    line-height: 1.6;
+    overscroll-behavior-y: contain;
+}
+
+/* 宣纸纹理背景 - 水墨风增强 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--paper-texture);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* 水墨晕染装饰 - 增强层次感 */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(ellipse at 5% 10%, rgba(47, 79, 79, 0.04) 0%, transparent 40%),
+        radial-gradient(ellipse at 95% 90%, rgba(47, 79, 79, 0.04) 0%, transparent 40%),
+        radial-gradient(ellipse at 50% 50%, rgba(139, 69, 19, 0.02) 0%, transparent 60%),
+        radial-gradient(ellipse at 30% 70%, rgba(218, 165, 32, 0.015) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ===== 大字模式 ===== */
+body.large-font {
+    font-size: 120%;
+}
+
+body.large-font .hero-card {
+    --card-width: 360px;
+    --card-height: 480px;
+}
+
+body.large-font .hero-name {
+    font-size: 38px;
+}
+
+body.large-font .card-back-content {
+    font-size: 15px;
+}
+
+/* ===== 头部 ===== */
+.app-header {
+    text-align: center;
+    padding: 30px 20px 20px;
+    background: linear-gradient(180deg, rgba(139,69,19,0.06) 0%, transparent 100%);
+    border-bottom: 1px solid rgba(139,69,19,0.12);
+    position: relative;
+}
+
+/* 卷轴装饰线 */
+.app-header::before,
+.app-header::after {
+    content: '◇';
+    position: absolute;
+    bottom: -8px;
+    color: var(--color-gold);
+    font-size: 16px;
+    background: var(--color-paper);
+    padding: 0 10px;
+}
+
+.app-header::before { left: 30%; }
+.app-header::after { right: 30%; }
+
+.app-title {
+    font-family: var(--font-brush);
+    font-size: 46px;
+    color: var(--color-ink);
+    text-shadow:
+        3px 3px 6px rgba(47, 79, 79, 0.15),
+        0 0 20px rgba(139, 69, 19, 0.08);
+    margin-bottom: 20px;
+    letter-spacing: 14px;
+    position: relative;
+}
+
+/* 标题装饰 - 书名号 */
+.app-title::before,
+.app-title::after {
+    content: '『';
+    color: var(--color-gold);
+    margin: 0 12px;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.app-title::after {
+    content: '』';
+}
+
+/* ===== 筛选导航 ===== */
+.filter-nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.filter-btn {
+    font-family: var(--font-body);
+    font-size: 15px;
+    padding: 10px 28px;
+    border: 2px solid var(--color-primary);
+    border-radius: 25px;
+    background: transparent;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 3px;
+    position: relative;
+    overflow: hidden;
+}
+
+.filter-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(139,69,19,0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.filter-btn:hover::before {
+    left: 100%;
+}
+
+.filter-btn:hover {
+    background: rgba(139,69,19,0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139,69,19,0.15);
+}
+
+.filter-btn.active {
+    background: var(--color-primary);
+    color: var(--color-paper-light);
+    box-shadow:
+        0 4px 12px rgba(139,69,19,0.3),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+/* ===== 排序控件 ===== */
+.sort-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.sort-btn {
+    font-family: var(--font-body);
+    font-size: 13px;
+    padding: 5px 14px;
+    border: 1px solid rgba(139, 69, 19, 0.2);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.5);
+    color: var(--color-text-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sort-btn:hover {
+    background: rgba(255,255,255,0.8);
+    border-color: var(--color-primary-light);
+    color: var(--color-text);
+}
+
+.sort-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 6px rgba(139, 69, 19, 0.3);
+}
+
+/* ===== 工具栏 ===== */
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 24px 10px;
+    gap: 15px;
+}
+
+.tool-btn {
+    font-family: var(--font-body);
+    font-size: 13px;
+    padding: 6px 14px;
+    border: 1px solid rgba(139,69,19,0.3);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.4);
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.tool-btn:hover {
+    background: rgba(139,69,19,0.1);
+    border-color: var(--color-primary);
+}
+
+.tool-btn.active {
+    background: var(--color-primary);
+    color: white;
+}

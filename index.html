@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水浒英雄传</title>
+    <!-- 引入中文字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/theme.css?v=33">
+    <link rel="stylesheet" href="css/card.css?v=33">
+    <link rel="stylesheet" href="css/card-detail.css?v=33">
+    <link rel="stylesheet" href="css/layout.css?v=33">
+    <link rel="stylesheet" href="css/quiz.css?v=33">
+    <link rel="stylesheet" href="css/achievements.css?v=33">
+    <link rel="stylesheet" href="css/footer.css?v=33">
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <h1 class="app-title">水浒英雄传</h1>
+            <div class="sort-controls">
+                <button class="sort-btn active" data-sort="rank">按座次</button>
+                <button class="sort-btn" data-sort="martial">按武力</button>
+                <button class="sort-btn" data-sort="star">按星级</button>
+            </div>
+        </header>
+        <main class="card-grid" id="cardGrid"></main>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="site-footer">
+        <!-- 上部：免责声明 -->
+        <div class="footer-disclaimer">
+            <p class="footer-brand">© 2026 水浒知识问答集卡 · 个人兴趣作品，非商业运营</p>
+            <p>《水浒传》为公共版权古典名著，人物与情节属于文化遗产</p>
+            <p>游戏内题目、卡片美术及程序为原创，仅供学习交流，严禁商用</p>
+            <p class="contact">联络/侵权申诉：<a href="mailto:dominator24@sina.com">dominator24@sina.com</a></p>
+        </div>
+
+        <!-- 中部：打赏区 -->
+        <div class="footer-donate">
+            <p class="donate-title">🏮 好汉留步！江湖救急，全凭哥哥们抬爱</p>
+            <div class="donate-tiers">
+                <button class="tier tier-btn" data-type="wechat">
+                    <span class="tier-price">💰 5元</span>
+                    <span class="tier-desc">筛一碗酒，解解渴</span>
+                </button>
+                <button class="tier tier-btn" data-type="wechat">
+                    <span class="tier-price">💰 10元</span>
+                    <span class="tier-desc">切二斤牛肉，吃饱好干活</span>
+                </button>
+            </div>
+            <!-- 二维码弹窗（默认隐藏） -->
+            <div class="donate-qrcodes" id="qrcodeModal" style="display: none;">
+                <div class="qrcode-overlay">
+                    <button class="qrcode-close" id="qrcodeClose">&times;</button>
+                    <div class="qrcode-content">
+                        <div class="qrcode-wrap" id="wechatQr">
+                            <img src="assets/img/wechat-reward.png" alt="微信打赏" class="qrcode" />
+                            <span class="qrcode-label">微信扫码打赏</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="donate-note">
+                扫码后随手填个酒肉钱，银子多少不论，情义到了便是兄弟
+                <br>
+                若是手头不便，道一声"哥哥辛苦"也是莫大的鼓舞
+            </p>
+        </div>
+    </footer>
+    <script src="js/data.js?v=33"></script>
+    <script src="js/pinyin-helper.js?v=33"></script>
+    <script src="js/hero-summaries.js?v=33"></script>
+    <script src="js/unlock.js?v=33"></script>
+    <script src="js/achievements.js?v=33"></script>
+    <script src="js/card.js?v=33"></script>
+    <script src="js/quiz.js?v=33"></script>
+    <script src="js/app.js?v=33"></script>
+    <script>
+    // 页脚打赏弹窗交互
+    (function() {
+        const tierBtns = document.querySelectorAll('.tier-btn');
+        const qrcodeModal = document.getElementById('qrcodeModal');
+        const qrcodeClose = document.getElementById('qrcodeClose');
+
+        if (!qrcodeModal) return;
+
+        // 点击打赏按钮显示微信二维码
+        tierBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                qrcodeModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        // 关闭弹窗
+        if (qrcodeClose) {
+            qrcodeClose.addEventListener('click', function() {
+                qrcodeModal.style.display = 'none';
+                document.body.style.overflow = '';
+            });
+        }
+
+        // 点击遮罩关闭
+        qrcodeModal.addEventListener('click', function(e) {
+            if (e.target === qrcodeModal) {
+                qrcodeModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+
+        // ESC 键关闭
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && qrcodeModal.style.display === 'flex') {
+                qrcodeModal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+    })();
+    </script>
+</body>
+</html>
