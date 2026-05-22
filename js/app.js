@@ -368,42 +368,103 @@
         // 创建按钮容器
         const btnContainer = document.createElement('div');
         btnContainer.className = 'floating-btn-container';
-        
-        // 拼音切换按钮
+
+        // ========== 打赏按钮（钱袋） ==========
+        const donateBtn = document.createElement('button');
+        donateBtn.className = 'donate-toggle';
+        donateBtn.innerHTML = '💰 赏';
+        donateBtn.title = '打赏支持';
+
+        // 创建精美打赏卡片
+        const donateCard = document.createElement('div');
+        donateCard.className = 'donate-card';
+        donateCard.innerHTML = `
+            <button class="donate-card-close" aria-label="关闭">&times;</button>
+            <div class="donate-card-header">
+                <span class="donate-card-lantern">🏮</span>
+                <p class="donate-card-title">江湖救急</p>
+                <p class="donate-card-subtitle">全凭哥哥们抬爱</p>
+            </div>
+            <div class="donate-card-body">
+                <img src="assets/img/wechat-reward.png" alt="微信打赏" class="donate-card-qr" />
+                <p class="donate-card-qr-label">微信扫码打赏</p>
+            </div>
+            <div class="donate-card-divider"></div>
+            <div class="donate-card-footer">
+                <p>银子多少不论</p>
+                <p>情义到了便是兄弟</p>
+            </div>
+        `;
+
+        // 点击按钮切换卡片显示
+        donateBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = donateCard.classList.contains('visible');
+            if (isVisible) {
+                donateCard.classList.remove('visible');
+            } else {
+                donateCard.classList.add('visible');
+            }
+        });
+
+        // 关闭按钮
+        donateCard.querySelector('.donate-card-close').addEventListener('click', (e) => {
+            e.stopPropagation();
+            donateCard.classList.remove('visible');
+        });
+
+        // 点击卡片外部关闭
+        document.addEventListener('click', (e) => {
+            if (!donateCard.contains(e.target) && e.target !== donateBtn) {
+                donateCard.classList.remove('visible');
+            }
+        });
+
+        // ESC 键关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && donateCard.classList.contains('visible')) {
+                donateCard.classList.remove('visible');
+            }
+        });
+
+        btnContainer.appendChild(donateBtn);
+        btnContainer.appendChild(donateCard);
+
+        // ========== 拼音切换按钮 ==========
         const toggle = document.createElement('button');
         toggle.className = 'pinyin-toggle';
         toggle.innerHTML = '拼';
         toggle.title = '显示/隐藏拼音';
-        
+
         toggle.addEventListener('click', () => {
             pinyinEnabled = !pinyinEnabled;
             document.body.classList.toggle('pinyin-hidden', !pinyinEnabled);
             toggle.classList.toggle('active', pinyinEnabled);
             toggle.innerHTML = pinyinEnabled ? '拼' : '文';
         });
-        
+
         btnContainer.appendChild(toggle);
-        
-        // 深色模式按钮
+
+        // ========== 深色模式按钮 ==========
         const darkModeBtn = document.createElement('button');
         darkModeBtn.className = 'dark-mode-toggle';
         darkModeBtn.innerHTML = '🌙';
         darkModeBtn.title = '切换深色/浅色模式';
-        
+
         darkModeBtn.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             darkModeBtn.innerHTML = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
             localStorage.setItem('shuihu_dark_mode', document.body.classList.contains('dark-mode') ? '1' : '0');
         });
-        
+
         btnContainer.appendChild(darkModeBtn);
-        
+
         // 恢复深色模式偏好
         if (localStorage.getItem('shuihu_dark_mode') === '1') {
             document.body.classList.add('dark-mode');
             darkModeBtn.innerHTML = '☀️';
         }
-        
+
         document.body.appendChild(btnContainer);
     }
 
